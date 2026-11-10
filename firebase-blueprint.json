@@ -1,0 +1,150 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "An individual toy product in the store catalogue",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number",
+          "description": "Unique numeric or sequential ID of the product"
+        },
+        "name": {
+          "type": "string",
+          "description": "Product display name in Persian",
+          "maxLength": 200
+        },
+        "category": {
+          "type": "string",
+          "description": "Category name of the toy",
+          "maxLength": 100
+        },
+        "price": {
+          "type": "number",
+          "description": "Current selling price in Tomans"
+        },
+        "oldPrice": {
+          "type": "number",
+          "description": "Original price before discount in Tomans"
+        },
+        "emoji": {
+          "type": "string",
+          "description": "Emoji icon representing the product",
+          "maxLength": 16
+        },
+        "desc": {
+          "type": "string",
+          "description": "Detailed description of the toy and features",
+          "maxLength": 2000
+        },
+        "stock": {
+          "type": "boolean",
+          "description": "Availability status of the product"
+        },
+        "image": {
+          "type": "string",
+          "description": "Image URL or data URI",
+          "maxLength": 500000
+        },
+        "featured": {
+          "type": "boolean",
+          "description": "Flag indicating if the product is featured or best-seller"
+        },
+        "salesCount": {
+          "type": "number",
+          "description": "Number of times sold"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO date string when product was created"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO date string when product was last updated"
+        }
+      },
+      "required": ["id", "name", "category", "price", "stock"]
+    },
+    "StoreSettings": {
+      "title": "StoreSettings",
+      "description": "Base store configuration and contact details",
+      "type": "object",
+      "properties": {
+        "storeName": { "type": "string", "maxLength": 150 },
+        "storeSlogan": { "type": "string", "maxLength": 250 },
+        "storeLogoEmoji": { "type": "string", "maxLength": 16 },
+        "brandBadge": { "type": "string", "maxLength": 100 },
+        "heroTitle": { "type": "string", "maxLength": 250 },
+        "heroSubtitle": { "type": "string", "maxLength": 1000 },
+        "whatsappNumber": { "type": "string", "maxLength": 30 },
+        "phoneNumber": { "type": "string", "maxLength": 30 },
+        "secondaryPhone": { "type": "string", "maxLength": 30 },
+        "instagramId": { "type": "string", "maxLength": 100 },
+        "telegramId": { "type": "string", "maxLength": 100 },
+        "storeAddress": { "type": "string", "maxLength": 500 },
+        "workingHours": { "type": "string", "maxLength": 200 },
+        "shippingInfo": { "type": "string", "maxLength": 300 },
+        "freeShippingThreshold": { "type": "number" },
+        "isAnnouncementActive": { "type": "boolean" },
+        "announcementText": { "type": "string", "maxLength": 500 },
+        "aboutText": { "type": "string", "maxLength": 2000 },
+        "adminPin": { "type": "string", "maxLength": 50 },
+        "pageSize": { "type": "number" },
+        "updatedAt": { "type": "string" }
+      }
+    },
+    "Review": {
+      "title": "Review",
+      "description": "Customer star rating and review comment for a product",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "productId": { "type": "number" },
+        "author": { "type": "string", "maxLength": 100 },
+        "rating": { "type": "number" },
+        "comment": { "type": "string", "maxLength": 1500 },
+        "likes": { "type": "number" },
+        "date": { "type": "string", "maxLength": 100 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "productId", "author", "rating", "comment"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "WhatsApp order submitted through the store",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "date": { "type": "string", "maxLength": 100 },
+        "customerName": { "type": "string", "maxLength": 150 },
+        "customerPhone": { "type": "string", "maxLength": 50 },
+        "customerCity": { "type": "string", "maxLength": 100 },
+        "customerAddress": { "type": "string", "maxLength": 500 },
+        "customerNotes": { "type": "string", "maxLength": 500 },
+        "isGift": { "type": "boolean" },
+        "totalPrice": { "type": "number" },
+        "items": { "type": "array" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "customerName", "customerPhone", "totalPrice"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Collection of all toy products in the store"
+    },
+    "/settings/{settingId}": {
+      "schema": "StoreSettings",
+      "description": "Configuration documents for store settings"
+    },
+    "/reviews/{reviewId}": {
+      "schema": "Review",
+      "description": "Product user reviews and ratings"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Store orders submitted to WhatsApp"
+    }
+  }
+}

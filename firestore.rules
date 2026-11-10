@@ -1,0 +1,94 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // اعتبارسنجی کالای اسباب‌بازی
+    function isValidProduct(data) {
+      return data.id is number
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 200
+        && data.category is string && data.category.size() > 0 && data.category.size() <= 100
+        && data.price is number && data.price >= 0
+        && data.stock is bool
+        && (!('emoji' in data) || (data.emoji is string && data.emoji.size() <= 16))
+        && (!('oldPrice' in data) || (data.oldPrice is number))
+        && (!('desc' in data) || (data.desc is string && data.desc.size() <= 2000))
+        && (!('image' in data) || (data.image is string && data.image.size() <= 500000))
+        && (!('featured' in data) || (data.featured is bool))
+        && (!('salesCount' in data) || (data.salesCount is number));
+    }
+
+    // اعتبارسنجی تنظیمات فروشگاه
+    function isValidStoreSettings(data) {
+      return (!('storeName' in data) || (data.storeName is string && data.storeName.size() <= 150))
+        && (!('whatsappNumber' in data) || (data.whatsappNumber is string && data.whatsappNumber.size() <= 30))
+        && (!('phoneNumber' in data) || (data.phoneNumber is string && data.phoneNumber.size() <= 30));
+    }
+
+    // اعتبارسنجی نظر و امتیاز کاربران
+    function isValidReview(data) {
+      return data.productId is number
+        && data.author is string && data.author.size() > 0 && data.author.size() <= 100
+        && data.rating is number && data.rating >= 1 && data.rating <= 5
+        && data.comment is string && data.comment.size() > 0 && data.comment.size() <= 1500;
+    }
+
+    // اعتبارسنجی سفارش واتساپ
+    function isValidOrder(data) {
+      return data.customerName is string && data.customerName.size() > 0 && data.customerName.size() <= 150
+        && data.customerPhone is string && data.customerPhone.size() > 0 && data.customerPhone.size() <= 50
+        && data.totalPrice is number && data.totalPrice >= 0;
+    }
+
+    // محصولات فروشگاه
+    match /products/{productId} {
+      allow read: if true;
+      allow create: if isValidId(productId) && isValidProduct(incoming());
+      allow update: if isValidId(productId) && isValidProduct(incoming());
+      allow delete: if isValidId(productId);
+    }
+
+    // اطلاعات پایه و تنظیمات
+    match /settings/{settingId} {
+      allow read: if true;
+      allow create: if isValidId(settingId) && isValidStoreSettings(incoming());
+      allow update: if isValidId(settingId) && isValidStoreSettings(incoming());
+      allow delete: if isValidId(settingId);
+    }
+
+    // نظرات و امتیازدهی
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isValidId(reviewId) && isValidReview(incoming());
+      allow update: if isValidId(reviewId) && (
+        isValidReview(incoming()) || 
+        incoming().diff(existing()).affectedKeys().hasOnly(['likes'])
+      );
+      allow delete: if isValidId(reviewId);
+    }
+
+    // سفارشات ثبت‌شده
+    match /orders/{orderId} {
+      allow read: if true;
+      allow create: if isValidId(orderId) && isValidOrder(incoming());
+      allow update: if isValidId(orderId) && isValidOrder(incoming());
+      allow delete: if isValidId(orderId);
+    }
+
+    // قانون پیش‌فرض امنیتی
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

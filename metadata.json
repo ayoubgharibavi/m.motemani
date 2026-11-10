@@ -1,0 +1,8 @@
+{
+  "name": "اسباب بازی فروشی متمنی",
+  "description": "فروشگاه آنلاین اسباب بازی متمنی با بیش از ۱۰۰۰ نوع اسباب بازی شاد و آموزنده و ثبت سریع سفارش در واتساپ.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
